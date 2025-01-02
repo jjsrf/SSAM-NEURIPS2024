@@ -1,0 +1,33 @@
+prune_ratios:
+  features.3.weight:
+    0.4
+  features.7.weight:
+    0.4
+  features.10.weight:
+    0.4
+  features.14.weight:
+    0.4
+  features.17.weight:
+    0.4
+  features.20.weight:
+    0.4
+  features.23.weight:
+    0.4
+  features.27.weight:
+    0.4
+  features.30.weight:
+    0.4
+  features.33.weight:
+    0.4
+  features.36.weight:
+    0.4
+  features.40.weight:
+    0.4
+  features.43.weight:
+    0.4
+  features.46.weight:
+    0.4
+  features.49.weight:
+    0.4
+rho:
+  0.001
