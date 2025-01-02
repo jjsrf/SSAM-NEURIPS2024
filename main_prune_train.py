@@ -9,13 +9,8 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import _LRScheduler
-
 import time
-import pickle
-import collections
-# from vgg import vgg16_bn, vgg19_bn
 from collections import deque
-# from resnet import resnet18, resnet50
 from models.resnet_ma import build_resnet
 from models.resnet_online import ResNet50, ResNet18
 from models.resnet_grasp import resnet32
@@ -24,13 +19,9 @@ from models.resnet20_no_residual import resnet20_no_residual
 from models.resnet20_wide import resnet20_wide
 from models.vgg_grasp import vgg16, vgg19
 from models.mobilenet import mobilenetv1
-
-from testers import *
-
 from numpy import linalg as LA
 import numpy as np
 from scipy import ndimage, misc
-
 from prune_utils import *
 from visualizer import *
 import random
@@ -126,13 +117,6 @@ parser.add_argument("--resume", default=None, type=str, metavar="PATH",
 parser.add_argument('--save-model', type=str, default=None,
                     help='optimizer used (default: adam)')
 
-# IMP setting
-parser.add_argument('--imp', action='store_true', default=False,
-                    help='enable iterative pruning by hard pruning to higher sparsity ratio at the end of the training')
-parser.add_argument('--imp-ratio', type=float, default=0.2,
-                    help='sparsity ratio for every iteration in imp prune')
-parser.add_argument('--imp-round', type=int, default=None,
-                    help='define imp round')
 
 # visulization loss surface
 parser.add_argument("--evaluate", action="store_true", help="evaluate checkpoint/model")
@@ -142,10 +126,6 @@ parser.add_argument("--vis-seed", default=None, type=int, help="random seed used
 parser.add_argument("--vis-delta", type=float, default=0, help="step size of the direction in visualization")
 parser.add_argument('--loss-surface-dir', default=None,type=str,help='dirctory to save loss function when perturbing the model')
 
-# resume specific block for GaP
-parser.add_argument("--resume-blk", default=None, type=int, help="the index of the blockto resume")
-parser.add_argument("--blk-config", default=None, type=str, help="block partition config in GaP")
-parser.add_argument("--blk-path", default=None, type=str, help="the checkpoint of the block that needs to be resumed")
 
 
 prune_parse_arguments(parser)
@@ -471,40 +451,6 @@ class GradualWarmupScheduler(_LRScheduler):
             return super(GradualWarmupScheduler, self).step(epoch)
 
 
-def blk_pool(blk_config, blk_id):
-    # blk_id = [1,2,3,4,5, ... , n]
-    blk_id = blk_id - 1
-
-    def file_read(layer_list_file=None):
-        if layer_list_file is None:
-            return
-        L = ""
-        with open(layer_list_file, 'r') as f:
-            lines = f.readlines()
-            for line in lines[1:]:
-                if line[0] != '#':
-                    line = line.strip()
-                    L += line
-
-        L = L.split('],[')
-        for i in range(len(L)):
-            L[i] = L[i].replace('[', '')
-            L[i] = L[i].replace(']', '')
-            L[i] = L[i].strip()
-            L[i] = L[i].split(',')
-            while ('' in L[i]):
-                L[i].remove('')
-
-        return L
-
-    # resnet-20 config only
-    pool = file_read(blk_config)
-    num_of_blk = len(pool)
-
-    assert blk_id <= num_of_blk, "\n * block id should range within the total number of blocks!\n"
-    return pool[blk_id]
-
-
 def main():
     all_acc = [0.000]
     epoch_cnt = 0
@@ -586,8 +532,6 @@ def main():
                 pre_defined_mask = pre_defined_mask
 
     criterion = CrossEntropyLossMaybeSmooth(smooth_eps=args.smooth_eps).cuda()
-    # args.smooth = args.smooth_eps > 0.0
-    # args.mixup = config.alpha > 0.0
 
     optimizer_init_lr = args.warmup_lr if args.warmup else args.lr
 
@@ -596,6 +540,8 @@ def main():
         optimizer = torch.optim.SGD(model.parameters(), optimizer_init_lr, momentum=0.9, weight_decay=1e-4)
     elif (args.optmzr == 'adam'):
         optimizer = torch.optim.Adam(model.parameters(), optimizer_init_lr)
+    
+    # Define SAM optimizer(v2 stands for our one-step version of SAM)
     elif args.optmzr == 'sgd-sam':
         base_optimizer = torch.optim.SGD
         optimizer = SAM(model.parameters(), base_optimizer, rho=args.sam_rho, adaptive=args.adaptive, lr=args.lr,
@@ -630,35 +576,6 @@ def main():
     if not scheduler_state is None:
         scheduler.load_state_dict(scheduler_state)
         print("=> loaded scheduler_state")
-
-    if args.resume_blk is not None:
-        blk_config = args.blk_config
-        blk_id = args.resume_blk  # blk_id = [1,2,3,4,...,n]
-        block_L_info = blk_pool(blk_config, blk_id)
-
-        if os.path.isfile(args.blk_path):
-            blk_checkpoint = torch.load(args.blk_path)
-            blk_state = blk_checkpoint['state_dict'] if "state_dict" in blk_checkpoint else blk_checkpoint
-
-            for l_name in block_L_info:
-                if not "downsample" in l_name:
-                    l_bn_w_name = l_name.replace("conv", "bn")
-                    l_bn_bias_name = l_bn_w_name.replace("weight", "bias")
-                else:
-                    l_bn_w_name = l_name.replace("downsample.0.", "downsample.1.")
-                    l_bn_bias_name = l_bn_w_name.replace("weight", "bias")
-
-                l_weight = blk_state[l_name]
-                l_bn_weight = blk_state[l_bn_w_name]
-                l_bn_bias = blk_state[l_bn_bias_name]
-                model.state_dict()[l_name].data.copy_(l_weight)
-                model.state_dict()[l_bn_w_name].data.copy_(l_bn_weight)
-                model.state_dict()[l_bn_bias_name].data.copy_(l_bn_bias)
-
-                print("==> migrated layer {} from {}".format(l_name, args.blk_path))
-        else:
-            print("\n * Resume block model not exist!\n")
-            time.sleep(5)
 
     log_filename = args.log_filename
     checkpoint_dir = args.save_model
@@ -772,43 +689,6 @@ def main():
                 best_epoch = epoch_cnt
         all_acc.append(prec1)
 
-    if args.imp:
-        print("\n** Saving for next round IMP \n")
-
-        if os.path.isfile(best_file_name[-1]):
-            print("=> loading checkpoint '{}'".format(best_file_name[-1]))
-            best_model_state = torch.load(best_file_name[-1])
-        else:
-            print("=> no checkpoint found at '{}'".format(args.resume))
-            exit()
-
-        model.load_state_dict(best_model_state)
-
-        sparsity_ratio = 1 - (1 - args.imp_ratio) ** (args.imp_round + 1)
-        sparsity_ratio = np.round(sparsity_ratio, 3)
-
-        args.sp_global_weight_sparsity = sparsity_ratio
-        args.sp_admm_update_epoch = 1
-        from prune_utils.admm import ADMM
-        prune_algo = ADMM(args, model, logger=None)
-        prune_algo.prune_harden()
-
-        save_checkpoint(
-            {
-                "epoch": epoch,
-                "arch": args.arch,
-                "state_dict": model.state_dict(),
-                "sparsity_ratio": sparsity_ratio,
-                "imp_ratio": args.imp_ratio,
-                "imp_round": args.imp_round
-            },
-            is_best=False,
-            checkpoint_dir=checkpoint_dir,
-            backup_filename=backup_filename,
-            filename="checkpoint_{}_harden_for_next_round.pth.tar".format(seed),
-            epoch=epoch,
-            args=args,
-        )
 
 
 if __name__ == '__main__':
