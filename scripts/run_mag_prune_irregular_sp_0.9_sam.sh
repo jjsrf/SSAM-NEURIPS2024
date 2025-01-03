@@ -23,31 +23,8 @@ REMARK=${15:-"run_1"}
 cd ..
 
 
-# SEED=${16:-"914"}
-# CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd-sam --adaptive --sam-v2 --sam-rho 0.05 --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
-
-SEED=${16:-"444"}
-CUDA_VISIBLE_DEVICES=1 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd-sam --adaptive --sam-v2 --sam-rho 0.05 --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
-# SEED=${16:-"729"}
-# CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd-sam --adaptive --sam-v2 --sam-rho 0.05 --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
-
-
-
-MUTATE_TYPE=${5:-"without"} # [with, without, no_mutate]
-CONFIG_FILE=${7:-"./profiles/resnet32_LTH/irregular/resnet_${SP}_${MUTATE_TYPE}.yaml"}
-SAVE_FOLDER=${10:-"checkpoints/${DATASET}/resnet32/mest/ep160/irregular_sp_${SP}_${MUTATE_TYPE}_sam_v2/"}
-
-# SEED=${16:-"914"}
-# CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd-sam --adaptive --sam-v2 --sam-rho 0.05 --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
 
 
 SEED=${16:-"444"}
 CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd-sam --adaptive --sam-v2 --sam-rho 0.05 --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
-# SEED=${16:-"729"}
-# CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd-sam --adaptive --sam-v2 --sam-rho 0.05 --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
 
