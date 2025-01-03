@@ -27,13 +27,6 @@ SEED=${16:-"914"}
 CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
 
 
-# SEED=${16:-"444"}
-# CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
-# SEED=${16:-"729"}
-# CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
-
 
 
 
@@ -43,14 +36,5 @@ SAVE_FOLDER=${10:-"checkpoints/${DATASET}/resnet32/random_init_mag_prune/ep160/i
 
 SEED=${16:-"914"}
 CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
-
-# SEED=${16:-"444"}
-# CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
-# SEED=${16:-"729"}
-# CUDA_VISIBLE_DEVICES=0 python3 -u main_prune_train.py --arch ${ARCH} --depth ${DEPTH} --dataset ${DATASET} --optmzr sgd --batch-size ${GLOBAL_BATCH_SIZE} --lr ${INIT_LR} --lr-scheduler cosine --save-model ${SAVE_FOLDER} --epochs ${EPOCHS} --seed ${SEED} --remark ${REMARK} ${PRUNE_ARGS} --sp-admm-sparsity-type=${SPARSITY_TYPE} --sp-config-file=${CONFIG_FILE} --log-filename=${SAVE_FOLDER}/log.txt 
-
-
 
 
